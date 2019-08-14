@@ -1,8 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+//useEffect - Edita funcionalidade quando um componente muda
+//ou é exibido em tela
 import {KeyboardAvoidingView, Platform, Text, StyleSheet, Image, TextInput, TouchableOpacity} from 'react-native';
-import logo from '../assets/logo.png'; 
+import AsyncStorage from '@react-native-community/async-storage';
 
-export default function Login() {
+import logo from '../assets/logo.png'; 
+import api from '../services/api';
+
+export default function Login( { navigation }) {
+    const [user, setUser] = useState('');
+
+    useEffect(() => {
+        AsyncStorage.getItem('user').then( user => {
+            if(user) {
+                navigation.navigate('Main', { user });
+            }
+        })
+    }, []);
+    /*Quando as variaveis dentro [] mudarem
+        o useEffect é executado, caso [] esteja vazio, ele só
+        executa uma vez*/
+
+    async function handleLogin() {
+        const response = await api.post('/devs', { username: user });
+        const { _id } = response.data;
+        await AsyncStorage.setItem('user', _id);
+        navigation.navigate('Main', { user: _id });
+    }
+
     return (
         <KeyboardAvoidingView style={styles.container}
         behavior="padding"
@@ -14,8 +39,10 @@ export default function Login() {
             placeholderTextColor="#999"
             autoCapitalize="none"
             autoCorrect={false}
+            value={user}
+            onChangeText={setUser}
             />    
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity onPress={handleLogin} style={styles.button}>
                 <Text style={styles.buttonText}>Entrar</Text>
             </TouchableOpacity>
         </KeyboardAvoidingView>
