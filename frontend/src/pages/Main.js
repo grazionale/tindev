@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import io from 'socket.io-client';
 import logo from '../assets/logo.svg';
 import dislike from '../assets/dislike.svg';
 import like from '../assets/like.svg';
+import itsamatch from '../assets/itsamatch.png';
 import './Main.css'
 import api from '../services/api';
 
 export default function Main({ match }) { //match são todos os parametros passados para está rota
     const [users, setUsers] = useState([]);
-
+    const [matchDev, setMatchDev] = useState(null);
     //Param1 = Função a ser executada, Array[param2] variaveis que quando alteradas irão chamar a função Param1. 
     //Obs: Se passar array[param2] vazio, então só irá executar a function uma vez
     useEffect(() => {
@@ -22,6 +24,17 @@ export default function Main({ match }) { //match são todos os parametros passa
             setUsers(response.data);
         }
         loadUsers();
+    }, [match.params.id]);
+
+    //Estabelece uma conexao com backend assim que entra na tela Main
+    useEffect(() => {
+        const socket = io('http://localhost:3333', {
+            query: { user: match.params.id }
+        });
+        //Fica ouvindo a function match ser executada no backend pelo 'socket.init'  
+        socket.on('match', dev => {
+            setMatchDev(dev);
+        })
     }, [match.params.id]);
 
     async function handleLike(id) {
@@ -67,6 +80,16 @@ export default function Main({ match }) { //match são todos os parametros passa
                 </ul>
             ) : (
                 <div className="empty">Acabou :/</div>
+            )}
+            {matchDev && (
+                <div className="match-container">
+                    <img src={itsamatch} alt="It's a match" />
+                    <img className="avatar" src={matchDev.avatar} alt="It's a match" />
+                    <strong>{matchDev.name}</strong>
+                    <p>{matchDev.bio}</p>
+                    <button type="button" onClick={ () => setMatchDev(null)}>FECHAR</button>
+                </div>
+
             )}
         </div>
     );
