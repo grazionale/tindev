@@ -6,6 +6,8 @@ YellowBox.ignoreWarnings = ([
   'Unrecognized WebSocket',
 ]);
 
+console.disableYellowBox = true;
+
 export default  function App() {
   return (
     <Routes/>
