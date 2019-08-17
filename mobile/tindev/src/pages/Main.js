@@ -13,7 +13,7 @@ import itsamatch from '../assets/itsamatch.png';
 export default function Main( { navigation }) {
     const id = navigation.getParam('user');
     const [users, setUsers] = useState([]);
-    const [matchDev, setMatchDev] = useState(true);
+    const [matchDev, setMatchDev] = useState(false);
 
     //Param1 = Função a ser executada, Array[param2] variaveis que quando alteradas irão chamar a função Param1. 
     //Obs: Se passar array[param2] vazio, então só irá executar a function uma vez
@@ -32,7 +32,7 @@ export default function Main( { navigation }) {
 
     //Estabelece uma conexao com backend assim que entra na tela Main
     useEffect(() => {
-        const socket = io('http://localhost:3333', {
+        const socket = io('http://172.25.150.61:3333', {
             query: { user: id }
         });
         //Fica ouvindo a function match ser executada no backend pelo 'socket.init'  
